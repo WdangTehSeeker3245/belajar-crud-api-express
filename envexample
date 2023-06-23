@@ -1,0 +1,2 @@
+DATABASE_URL=mysql://admin:izausadmin@localhost:3306/products
+PORT = 3000
