@@ -1,8 +1,9 @@
+// routes/product.js
+
 const express = require('express');
 const router = express.Router();
-const { PrismaClient } = require('@prisma/client');
-
-const prisma = new PrismaClient();
+const prisma = require('../prisma');
+const authMiddleware = require('../middleware/auth');
 
 // Get all products
 router.get('/', async (req, res) => {
@@ -15,54 +16,65 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Create a new product
-router.post('/', async (req, res) => {
+// POST endpoint to create a product
+router.post('/', authMiddleware, (req, res) => {
   const { name, price } = req.body;
 
-  try {
-    const product = await prisma.product.create({
-      data: {
-        name,
-        price: parseInt(price),
-      },
+  prisma.product.create({
+    data: {
+      name,
+      price: parseInt(price),
+    },
+  })
+    .then(() => {
+      res.status(200).json({ 'message': 'Product inserted successfully' });
+    })
+    .catch((error) => {
+      console.error('Error creating product:', error);
+      res.status(500).json({ error: 'An error occurred while creating a product.' });
     });
-    res.status(200).json({ 'message': 'Product inserted successfully' });
-  } catch (error) {
-    console.error('Error creating product:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
 });
 
-// Update a product
-router.put('/:id', async (req, res) => {
+// PUT endpoint to update a product
+router.put('/:id', authMiddleware, (req, res) => {
   const { id } = req.params;
   const { name, price } = req.body;
 
-  try {
-    const product = await prisma.product.update({
-      where: { id: parseInt(id) },
-      data: { name, price: parseInt(price) },
+  prisma.product.update({
+    where: {
+      id: parseInt(id),
+    },
+    data: {
+      name,
+      price: parseInt(price),
+    },
+  })
+    .then(() => {
+      res.status(200).json({ 'message': 'Product updated successfully' });
+    })
+    .catch((error) => {
+      console.error('Error updating product:', error);
+      res.status(500).json({ error: 'An error occurred while updating a product.' });
     });
-    res.status(200).json({ 'message': 'Product updated successfully' });
-  } catch (error) {
-    console.error('Error updating product:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
 });
 
-// Delete a product
-router.delete('/:id', async (req, res) => {
+
+// DELETE endpoint to delete a product
+router.delete('/:id', authMiddleware, (req, res) => {
   const { id } = req.params;
 
-  try {
-    const product = await prisma.product.delete({
-      where: { id: parseInt(id) },
+  prisma.product.delete({
+    where: {
+      id: parseInt(id),
+    },
+  })
+    .then(() => {
+      res.status(200).json({ 'message': 'Product deleted successfully' });
+    })
+    .catch((error) => {
+      console.error('Error deleting product:', error);
+      res.status(500).json({ error: 'An error occurred while deleting a product.' });
     });
-    res.status(200).json({ 'message': 'Product deleted successfully' });
-  } catch (error) {
-    console.error('Error deleting product:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
 });
 
 module.exports = router;

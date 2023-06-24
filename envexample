@@ -1,2 +1,4 @@
 DATABASE_URL=mysql://admin:izausadmin@localhost:3306/products
-PORT = 3000
+ACCESS_TOKEN_SECRET=belajar-api-express
+REFRESH_TOKEN_SECRET=belajar-api-express-refresh
+PORT = 5000
